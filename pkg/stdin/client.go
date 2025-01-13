@@ -10,9 +10,10 @@ import (
 type Client struct {
 	cmd *exec.Cmd
 
-	medias []*core.Media
-	sender *core.Sender
-	send   int
+	medias  []*core.Media
+	sender  *core.Sender
+	send    int
+	OnClose func() error
 }
 
 func NewClient(cmd *exec.Cmd) (*Client, error) {

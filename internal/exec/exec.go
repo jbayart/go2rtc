@@ -74,17 +74,23 @@ func execHandle(rawURL string) (core.Producer, error) {
 		debug: log.Debug().Enabled(),
 	}
 
-	if query.Get("backchannel") == "1" {
-		return stdin.NewClient(cmd)
-	}
-
 	cl := &closer{cmd: cmd, query: query}
+
+	if query.Get("backchannel") == "1" {
+		return handleBackchannel(cmd, cl)
+	}
 
 	if path == "" {
 		return handlePipe(rawURL, cmd, cl)
 	}
 
 	return handleRTSP(rawURL, cmd, cl, path)
+}
+
+func handleBackchannel(cmd *exec.Cmd, cl io.Closer) (core.Producer, error) {
+	prod, err := stdin.NewClient(cmd)
+	prod.OnClose = cl.Close
+	return prod, err
 }
 
 func handlePipe(source string, cmd *exec.Cmd, cl io.Closer) (core.Producer, error) {

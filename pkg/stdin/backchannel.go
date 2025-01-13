@@ -45,6 +45,9 @@ func (c *Client) Stop() (err error) {
 	if c.cmd.Process == nil {
 		return nil
 	}
+	if c.OnClose != nil {
+		return c.OnClose()
+	}
 	return errors.Join(c.cmd.Process.Kill(), c.cmd.Wait())
 }
 
